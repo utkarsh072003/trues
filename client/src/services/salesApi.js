@@ -1,4 +1,5 @@
- const BASE_URL = "http://localhost:5000/api/sales";
+ const BASE_URL = "https://trues.onrender.com/api/sales";
+
 
 
 export const fetchSales = async (params = {}) => {
