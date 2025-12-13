@@ -4,14 +4,20 @@ import followRedirects from "follow-redirects";
 const { https } = followRedirects;
 
 const CSV_URL =
-  "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
+  "https://github.com/<USERNAME>/<REPO>/releases/download/v1.0/sales.csv";
 
 export const loadSalesData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
 
-    https
-      .get(CSV_URL, (response) => {
+    https.get(
+      CSV_URL,
+      {
+        headers: {
+          "User-Agent": "node.js"
+        }
+      },
+      (response) => {
         console.log("Final Content-Type:", response.headers["content-type"]);
 
         response
@@ -22,7 +28,7 @@ export const loadSalesData = () => {
             resolve(results);
           })
           .on("error", reject);
-      })
-      .on("error", reject);
+      }
+    ).on("error", reject);
   });
 };
