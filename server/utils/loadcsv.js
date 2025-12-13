@@ -8,14 +8,7 @@ export const loadSalesData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
 
-    https
-      .get(CSV_URL, (response) => {
-        response
-          .pipe(csv())
-          .on("data", (data) => results.push(data))
-          .on("end", () => resolve(results))
-          .on("error", (err) => reject(err));
-      })
-      .on("error", (err) => reject(err));
-  });
+    https.get(CSV_URL, (response) => {
+  console.log("Content-Type:", response.headers["content-type"]);
+
 };
