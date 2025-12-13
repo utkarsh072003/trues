@@ -1,37 +1,45 @@
 import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
+import followRedirects from "follow-redirects";
+
+const { https } = followRedirects;
 
 const CSV_PATH = path.join("/tmp", "sales.csv");
 
 const DOWNLOAD_URL =
-  "https://github.com/<USERNAME>/<REPO>/releases/download/v1.0/sales.csv";
+  "https://huggingface.co/datasets/utkarsh072003/truestate-sales-data/blob/main/sales.csv";
 
-const downloadCSVIfNeeded = async () => {
-  console.log("➡️ Checking CSV at", CSV_PATH);
+const downloadCSVIfNeeded = () => {
+  return new Promise((resolve, reject) => {
+    if (fs.existsSync(CSV_PATH)) {
+      console.log("✅ CSV already exists locally");
+      return resolve();
+    }
 
-  if (fs.existsSync(CSV_PATH)) {
-    console.log("✅ CSV already exists locally");
-    return;
-  }
+    console.log("⬇️ Downloading CSV from Hugging Face...");
 
-  console.log("⬇️ Downloading CSV...");
+    const file = fs.createWriteStream(CSV_PATH);
 
-  const response = await fetch(DOWNLOAD_URL); // ✅ global fetch (Node 22)
+    https.get(DOWNLOAD_URL, (response) => {
+      if (response.statusCode !== 200) {
+        return reject(
+          new Error(`Failed to download CSV: ${response.statusCode}`)
+        );
+      }
 
-  if (!response.ok) {
-    throw new Error(`Failed to download CSV: ${response.status}`);
-  }
+      response.pipe(file);
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-  fs.writeFileSync(CSV_PATH, buffer);
-
-  console.log("✅ CSV downloaded to local disk");
+      file.on("finish", () => {
+        file.close();
+        console.log("✅ CSV downloaded to local disk");
+        resolve();
+      });
+    }).on("error", reject);
+  });
 };
 
 export const loadSalesData = async () => {
-  console.log("➡️ loadSalesData called");
-
   await downloadCSVIfNeeded();
 
   return new Promise((resolve, reject) => {
