@@ -1,6 +1,5 @@
 import csv from "csv-parser";
-import https from "https";
-
+import { https } from "follow-redirects";
 
 const CSV_URL =
   "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
@@ -11,8 +10,8 @@ export const loadSalesData = () => {
 
     https
       .get(CSV_URL, (response) => {
-       console.log("CSV Content-Type:", response.headers["content-type"]);
-        
+        console.log("Final Content-Type:", response.headers["content-type"]);
+
         response
           .pipe(csv())
           .on("data", (row) => results.push(row))
@@ -20,8 +19,8 @@ export const loadSalesData = () => {
             console.log(`CSV loaded: ${results.length} records`);
             resolve(results);
           })
-          .on("error", (err) => reject(err));
+          .on("error", reject);
       })
-      .on("error", (err) => reject(err));
+      .on("error", reject);
   });
 };
