@@ -1,28 +1,37 @@
 import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
+import fetch from "node-fetch";
 
 const CSV_PATH = path.join("/tmp", "sales.csv");
 
-// 🔹 One-time download URL (can still be GitHub release)
 const DOWNLOAD_URL =
-  "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
-
+  "https://github.com/<USERNAME>/<REPO>/releases/download/v1.0/sales.csv";
 
 const downloadCSVIfNeeded = async () => {
-  if (fs.existsSync(CSV_PATH)) return;
+  console.log("➡️ Checking CSV at", CSV_PATH);
+
+  if (fs.existsSync(CSV_PATH)) {
+    console.log("✅ CSV already exists locally");
+    return;
+  }
+
+  console.log("⬇️ Downloading CSV...");
 
   const response = await fetch(DOWNLOAD_URL);
   if (!response.ok) {
-    throw new Error("Failed to download CSV");
+    throw new Error(`Failed to download CSV: ${response.status}`);
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());
   fs.writeFileSync(CSV_PATH, buffer);
-  console.log("CSV downloaded to local disk");
+
+  console.log("✅ CSV downloaded to local disk");
 };
 
 export const loadSalesData = async () => {
+  console.log("➡️ loadSalesData called");
+
   await downloadCSVIfNeeded();
 
   return new Promise((resolve, reject) => {
