@@ -1,14 +1,25 @@
 import csv from "csv-parser";
 import https from "https";
 
+
 const CSV_URL =
-  "https://drive.google.com/uc?export=download&id=1UxF0YlkdQUUNmjkPoIBajbt3fXQvmo_l";
+  "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
 
 export const loadSalesData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
 
-    https.get(CSV_URL, (response) => {
-  console.log("Content-Type:", response.headers["content-type"]);
-
+    https
+      .get(CSV_URL, (response) => {
+        response
+          .pipe(csv())
+          .on("data", (row) => results.push(row))
+          .on("end", () => {
+            console.log(`CSV loaded: ${results.length} records`);
+            resolve(results);
+          })
+          .on("error", (err) => reject(err));
+      })
+      .on("error", (err) => reject(err));
+  });
 };
