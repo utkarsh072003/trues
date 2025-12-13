@@ -1,5 +1,7 @@
 import csv from "csv-parser";
-import { https } from "follow-redirects";
+import followRedirects from "follow-redirects";
+
+const { https } = followRedirects;
 
 const CSV_URL =
   "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
