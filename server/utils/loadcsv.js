@@ -1,20 +1,21 @@
-import fs from "fs";
-import path from "path";
 import csv from "csv-parser";
-import { fileURLToPath } from "url";
+import https from "https";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const CSV_URL =
+  "https://drive.google.com/uc?export=download&id=1UxF0YlkdQUUNmjkPoIBajbt3fXQvmo_l";
 
 export const loadSalesData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
-    const filePath = path.join(__dirname, "../data/sales.csv");
 
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on("data", (data) => results.push(data))
-      .on("end", () => resolve(results))
+    https
+      .get(CSV_URL, (response) => {
+        response
+          .pipe(csv())
+          .on("data", (data) => results.push(data))
+          .on("end", () => resolve(results))
+          .on("error", (err) => reject(err));
+      })
       .on("error", (err) => reject(err));
   });
 };
