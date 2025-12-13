@@ -11,6 +11,8 @@ export const loadSalesData = () => {
 
     https
       .get(CSV_URL, (response) => {
+       console.log("CSV Content-Type:", response.headers["content-type"]);
+        
         response
           .pipe(csv())
           .on("data", (row) => results.push(row))
