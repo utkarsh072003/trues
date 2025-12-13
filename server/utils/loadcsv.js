@@ -8,7 +8,7 @@ const { https } = followRedirects;
 const CSV_PATH = path.join("/tmp", "sales.csv");
 
 const DOWNLOAD_URL =
-  "https://huggingface.co/datasets/utkarsh072003/truestate-sales-data/resolve/main/sales.csv?download=1";
+  "https://huggingface.co/datasets/utkarsh072003/truestate-sales-data/resolve/main/sales_reduced.csv";
 
 const downloadCSVIfNeeded = () => {
   return new Promise((resolve, reject) => {
