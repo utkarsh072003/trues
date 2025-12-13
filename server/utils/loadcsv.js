@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import csv from "csv-parser";
-import fetch from "node-fetch";
 
 const CSV_PATH = path.join("/tmp", "sales.csv");
 
@@ -18,7 +17,8 @@ const downloadCSVIfNeeded = async () => {
 
   console.log("⬇️ Downloading CSV...");
 
-  const response = await fetch(DOWNLOAD_URL);
+  const response = await fetch(DOWNLOAD_URL); // ✅ global fetch (Node 22)
+
   if (!response.ok) {
     throw new Error(`Failed to download CSV: ${response.status}`);
   }
