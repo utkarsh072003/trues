@@ -1,20 +1,27 @@
-import fs from "fs";
-import path from "path";
 import csv from "csv-parser";
-import { fileURLToPath } from "url";
+import https from "https";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
+const CSV_URL =
+  "https://github.com/utkarsh072003/trues/releases/download/v1.0/sales.csv";
 
 export const loadSalesData = () => {
   return new Promise((resolve, reject) => {
     const results = [];
-    const filePath = path.join(__dirname, "../data/sales.csv");
 
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on("data", (data) => results.push(data))
-      .on("end", () => resolve(results))
+    https
+      .get(CSV_URL, (response) => {
+       console.log("CSV Content-Type:", response.headers["content-type"]);
+        
+        response
+          .pipe(csv())
+          .on("data", (row) => results.push(row))
+          .on("end", () => {
+            console.log(`CSV loaded: ${results.length} records`);
+            resolve(results);
+          })
+          .on("error", (err) => reject(err));
+      })
       .on("error", (err) => reject(err));
   });
 };
