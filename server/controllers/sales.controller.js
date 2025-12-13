@@ -42,9 +42,13 @@ export const getSales = async (req, res) => {
     const result = await getFilteredSales(options);
 
     res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch sales data"
-    });
-  }
+  }catch (error) {
+  console.error("❌ getSales error:", error);
+
+  res.status(500).json({
+    message: "Failed to fetch sales data",
+    error: error.message
+  });
+}
+
 };
