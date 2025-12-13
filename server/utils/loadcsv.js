@@ -8,13 +8,12 @@ const { https } = followRedirects;
 const CSV_PATH = path.join("/tmp", "sales.csv");
 
 const DOWNLOAD_URL =
-  "https://huggingface.co/datasets/utkarsh072003/truestate-sales-data/blob/main/sales.csv";
+  "https://huggingface.co/datasets/utkarsh072003/truestate-sales-data/resolve/main/sales.csv?download=1";
 
 const downloadCSVIfNeeded = () => {
   return new Promise((resolve, reject) => {
     if (fs.existsSync(CSV_PATH)) {
-      console.log("✅ CSV already exists locally");
-      return resolve();
+      fs.unlinkSync(CSV_PATH); // TEMP: remove after success
     }
 
     console.log("⬇️ Downloading CSV from Hugging Face...");
@@ -22,10 +21,11 @@ const downloadCSVIfNeeded = () => {
     const file = fs.createWriteStream(CSV_PATH);
 
     https.get(DOWNLOAD_URL, (response) => {
-      if (response.statusCode !== 200) {
-        return reject(
-          new Error(`Failed to download CSV: ${response.statusCode}`)
-        );
+      const ct = response.headers["content-type"];
+      console.log("📄 Content-Type:", ct);
+
+      if (!ct || !ct.includes("csv")) {
+        return reject(new Error(`Invalid content-type: ${ct}`));
       }
 
       response.pipe(file);
@@ -38,6 +38,7 @@ const downloadCSVIfNeeded = () => {
     }).on("error", reject);
   });
 };
+
 
 export const loadSalesData = async () => {
   await downloadCSVIfNeeded();
