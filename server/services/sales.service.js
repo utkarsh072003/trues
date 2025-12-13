@@ -1,5 +1,7 @@
 import { loadSalesData } from "../utils/loadcsv.js";
 
+let cachedData = null;
+
 const applySearch = (data, search) => {
   if (!search) return data;
 
@@ -83,9 +85,11 @@ const applyPagination = (data, page, pageSize) => {
 };
 
 export const getFilteredSales = async (options) => {
-  const rawData = await loadSalesData();
+  if (!cachedData) {
+    cachedData = await loadSalesData();
+  }
 
-  let processed = applySearch(rawData, options.search);
+  let processed = applySearch(cachedData, options.search);
   processed = applyFilters(processed, options);
   processed = applySorting(processed, options.sortBy, options.order);
 
@@ -93,13 +97,13 @@ export const getFilteredSales = async (options) => {
   const totalPages = Math.ceil(totalRecords / options.pageSize);
 
   const safePage =
-  totalPages === 0
-    ? 1
-    : options.page < 1
-    ? 1
-    : options.page > totalPages
-    ? totalPages
-    : options.page;
+    totalPages === 0
+      ? 1
+      : options.page < 1
+      ? 1
+      : options.page > totalPages
+      ? totalPages
+      : options.page;
 
   const paginatedData = applyPagination(processed, safePage, options.pageSize);
 
@@ -111,3 +115,4 @@ export const getFilteredSales = async (options) => {
     totalPages
   };
 };
+
