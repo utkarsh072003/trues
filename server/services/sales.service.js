@@ -85,7 +85,7 @@ const applyPagination = (data, page, pageSize) => {
 };
 
 export const getFilteredSales = async (options) => {
-  if (!cachedData) {
+  if (!cachedData || cachedData.length === 0) {
     cachedData = await loadSalesData();
   }
 
@@ -105,14 +105,13 @@ export const getFilteredSales = async (options) => {
       ? totalPages
       : options.page;
 
-  const paginatedData = applyPagination(processed, safePage, options.pageSize);
-
   return {
-    data: paginatedData,
+    data: applyPagination(processed, safePage, options.pageSize),
     page: safePage,
     pageSize: options.pageSize,
     totalRecords,
     totalPages
   };
 };
+
 
