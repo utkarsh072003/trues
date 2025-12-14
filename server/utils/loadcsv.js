@@ -12,9 +12,7 @@ const DOWNLOAD_URL =
 
 const downloadCSVIfNeeded = () => {
   return new Promise((resolve, reject) => {
-    if (fs.existsSync(CSV_PATH)) {
-      fs.unlinkSync(CSV_PATH); // TEMP: remove after success
-    }
+    
 
     console.log("⬇️ Downloading CSV from Hugging Face...");
 
